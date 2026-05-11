@@ -7,3 +7,4 @@ public class ConsumerClient {
         System.out.println("Consumer started");
     }
 }
+
