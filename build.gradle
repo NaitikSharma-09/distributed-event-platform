@@ -1,0 +1,13 @@
+// build.gradle
+
+plugins {
+    id 'java'
+}
+
+group = 'com.eventstream'
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
