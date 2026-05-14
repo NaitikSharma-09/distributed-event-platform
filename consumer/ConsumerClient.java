@@ -1,49 +1,61 @@
 // consumer/ConsumerClient.java
-
 package consumer;
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Scanner;
-import java.util.ArrayList;
-import broker.TopicManager;
 
 public class ConsumerClient {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        try {
 
-        System.out.print("Enter topic to consume: ");
+            Socket socket =
+                    new Socket("localhost", 9092);
 
-        String topic = scanner.nextLine();
+            BufferedReader reader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    socket.getInputStream()
+                            )
+                    );
 
-        while (true) {
+            PrintWriter writer =
+                    new PrintWriter(
+                            socket.getOutputStream(),
+                            true
+                    );
 
-            List<Object> messages =
-                    TopicManager.getMessages(topic);
+            Scanner scanner =
+                    new Scanner(System.in);
 
-            System.out.println(
-                    "\nMessages in topic [" + topic + "]"
+            System.out.print(
+                    "Enter topic to subscribe: "
             );
 
-            for (Object message : messages) {
-                // TopicManager.Message is a static inner class
-                // We reflect the actual type at runtime for clarity:
-                // Assuming it's a TopicManager.Message
-                try {
-                    java.lang.reflect.Method getPayload = message.getClass().getMethod("getPayload");
-                    Object payload = getPayload.invoke(message);
-                    System.out.println(payload);
-                } catch (Exception e) {
-                    System.out.println(message.toString());
-                }
+            String topic =
+                    scanner.nextLine();
+
+            writer.println("SUBSCRIBE:" + topic);
+
+            System.out.println(
+                    "Subscribed to topic: " + topic
+            );
+
+            String message;
+
+            while ((message = reader.readLine()) != null) {
+
+                System.out.println(
+                        "Received -> " + message
+                );
             }
 
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

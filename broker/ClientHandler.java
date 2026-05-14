@@ -2,10 +2,11 @@
 
 package broker;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
-import broker.TopicManager;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ClientHandler implements Runnable {
 
@@ -20,37 +21,102 @@ public class ClientHandler implements Runnable {
 
         try {
 
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream())
-            );
+            BufferedReader reader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    socket.getInputStream()
+                            )
+                    );
+
+            PrintWriter writer =
+                    new PrintWriter(
+                            socket.getOutputStream(),
+                            true
+                    );
 
             String input;
 
             while ((input = reader.readLine()) != null) {
 
-                System.out.println("Raw Input: " + input);
+                System.out.println("Received: " + input);
 
-                String[] parts = input.split(":", 2);
+                // CONSUMER SUBSCRIBE
+                if (input.startsWith("SUBSCRIBE:")) {
 
-                if (parts.length < 2) {
+                    String topic =
+                            input.substring(10);
 
-                    System.out.println("Invalid message format");
+                    System.out.println(
+                            "Consumer subscribed to " + topic
+                    );
 
-                    continue;
+                    Set<String> sentMessages =
+                            new HashSet<>();
+
+                    while (true) {
+
+                        List<Message> messages =
+                                TopicManager.getMessages(topic);
+
+                        for (Message message : messages) {
+
+                            if (!sentMessages.contains(
+                                    message.getPayload()
+                            )) {
+
+                                writer.println(
+                                        message.getPayload()
+                                );
+
+                                sentMessages.add(
+                                        message.getPayload()
+                                );
+                            }
+                        }
+
+                        Thread.sleep(1000);
+                    }
                 }
 
-                String topic = parts[0];
+                // PRODUCER MESSAGE
+                else {
 
-                String payload = parts[1];
+                    String[] parts =
+                            input.split(":", 2);
 
-                // Use TopicManager.Message and TopicManager
-                TopicManager.Message message = new TopicManager.Message(payload);
+                    if (parts.length < 2) {
 
-                TopicManager.addMessage(topic, message);
+                        System.out.println(
+                                "Invalid format"
+                        );
 
-                System.out.println(
-                        "Stored message in topic [" + topic + "] : " + payload
-                );
+                        continue;
+                    }
+
+                    String topic = parts[0];
+
+                    String payload = parts[1];
+
+                    Message message =
+                            new Message(topic, payload);
+
+                    TopicManager.addMessage(
+                            topic,
+                            message
+                    );
+
+                    LogWriter.write(
+                            topic,
+                            payload
+                    );
+
+                    System.out.println(
+                            "Stored message in [" +
+                                    topic +
+                                    "] : " +
+                                    payload
+                    );
+                }
             }
 
         } catch (Exception e) {

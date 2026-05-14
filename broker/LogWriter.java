@@ -11,14 +11,19 @@ public class LogWriter {
     ) {
 
         try {
+
             FileWriter writer =
-                    new FileWriter(topic + ".log", true);
+                    new FileWriter(
+                            topic + ".log",
+                            true
+                    );
 
             writer.write(payload + "\n");
 
             writer.close();
 
         } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
