@@ -1,7 +1,6 @@
 {
   "java.project.sourcePaths": ["."],
   "java.project.outputPath": "out",
-  "java.project.referencedLibraries": [],
   "java.jdt.ls.java.home": "/usr/lib/jvm/jdk-25.0.2-oracle-x64",
   "java.configuration.runtimes": [
     {
