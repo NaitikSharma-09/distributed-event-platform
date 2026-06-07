@@ -1,7 +1,6 @@
 {
   "java.project.sourcePaths": ["."],
   "java.project.outputPath": "bin",
-  "java.project.referencedLibraries": [],
   "java.jdt.ls.java.home": "/usr/lib/jvm/jdk-25.0.2-oracle-x64",
   "java.configuration.runtimes": [
     {
@@ -10,6 +9,5 @@
       "default": true
     }
   ],
-  "java.import.gradle.enabled": true,
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.import.gradle.enabled": false
 }
