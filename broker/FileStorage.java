@@ -2,10 +2,24 @@ package broker;
 
 import java.io.File;
 
-public class FileStorage {
-    // Placeholder utility for future storage implementations.
-    // Keep minimal to avoid compile/runtime issues when referenced.
-    public static File getLogFile(String topic) {
+/**
+ * Utility for managing file paths for topic storage.
+ */
+public final class FileStorage {
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private FileStorage() {
+    }
+
+    /**
+     * Gets the log file for a specific topic.
+     *
+     * @param topic the topic name
+     * @return the log file
+     */
+    public static File getLogFile(final String topic) {
         return new File(topic + ".log");
     }
 }

@@ -2,32 +2,48 @@
 
 package broker;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import shared.Constants;
 
-public class BrokerServer {
+/**
+ * The main entry point for the Broker Server.
+ * Listens for client connections and delegates them to ClientHandlers.
+ */
+public final class BrokerServer {
 
-    public static void main(String[] args) {
+    /**
+     * Thread pool for managing client handler threads.
+     */
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
 
-        try {
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private BrokerServer() {
+    }
 
-            ServerSocket serverSocket = new ServerSocket(9092);
+    /**
+     * Starts the Broker Server and listens for incoming connections.
+     *
+     * @param args command line arguments (not used)
+     */
+    public static void main(final String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(Constants.PORT)) {
+            System.out.println("Broker Server started on port " + Constants.PORT);
 
-            System.out.println("Broker Server started on port 9092");
-
-            while (true) {
-
+            while (!Thread.currentThread().isInterrupted()) {
                 final Socket socket = serverSocket.accept();
-
-                System.out.println("New client connected");
-
-                new Thread(new ClientHandler(socket)).start();
+                System.out.println("New client connected: " + socket.getRemoteSocketAddress());
+                THREAD_POOL.execute(new ClientHandler(socket));
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Broker Server I/O error: " + e.getMessage());
+        } finally {
+            THREAD_POOL.shutdown();
         }
     }
 }

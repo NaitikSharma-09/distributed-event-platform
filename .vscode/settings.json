@@ -1,8 +1,15 @@
 {
-  "java.project.sourcePaths": [
-    "broker",
-    "consumer",
-    "producer",
-    "shared"
-  ]
+  "java.project.sourcePaths": ["."],
+  "java.project.outputPath": "bin",
+  "java.project.referencedLibraries": [],
+  "java.jdt.ls.java.home": "/usr/lib/jvm/jdk-25.0.2-oracle-x64",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "/usr/lib/jvm/jdk-25.0.2-oracle-x64",
+      "default": true
+    }
+  ],
+  "java.import.gradle.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic"
 }

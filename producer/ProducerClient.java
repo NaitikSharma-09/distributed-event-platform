@@ -3,39 +3,55 @@ package producer;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import shared.Constants;
 
-public class ProducerClient {
+/**
+ * A client that publishes messages to specific topics.
+ */
+public final class ProducerClient {
 
-    public static void main(String[] args) {
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private ProducerClient() {
+    }
 
-        try {
-
-            Socket socket = new Socket("localhost", 9092);
-
-            PrintWriter writer =
-                    new PrintWriter(socket.getOutputStream(), true);
-
-            Scanner scanner = new Scanner(System.in);
-
-            System.out.println("Connected to Broker");
+    /**
+     * Starts the producer client.
+     *
+     * @param args command line arguments
+     */
+    public static void main(final String[] args) {
+        try (
+            Socket socket = new Socket(Constants.HOST, Constants.PORT);
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            Scanner scanner = new Scanner(System.in)
+        ) {
+            System.out.println("Connected to Broker at " + Constants.HOST + ":" + Constants.PORT);
 
             while (true) {
-
-                System.out.print("Enter topic: ");
-                String topic = scanner.nextLine();
+                System.out.print("Enter topic (or 'exit'): ");
+                if (!scanner.hasNextLine()) {
+                    break;
+                }
+                final String topic = scanner.nextLine().trim();
+                if (topic.equalsIgnoreCase("exit")) {
+                    break;
+                }
 
                 System.out.print("Enter message: ");
-                String payload = scanner.nextLine();
+                if (!scanner.hasNextLine()) {
+                    break;
+                }
+                final String payload = scanner.nextLine();
 
-                String finalMessage = topic + ":" + payload;
-
+                final String finalMessage = topic + Constants.MESSAGE_SEPARATOR + payload;
                 writer.println(finalMessage);
 
                 System.out.println("Sent -> " + finalMessage);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (final Exception e) {
+            System.err.println("Producer error: " + e.getMessage());
         }
     }
-} 
+}

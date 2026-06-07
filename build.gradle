@@ -8,6 +8,11 @@ group = 'com.eventstream'
 
 version = '1.0'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 repositories {
     mavenCentral()
 }
@@ -15,7 +20,8 @@ repositories {
 sourceSets {
     main {
         java {
-            srcDirs = ['broker', 'consumer', 'producer', 'shared']
+            srcDir '.'
+            include 'broker/**/*.java', 'consumer/**/*.java', 'producer/**/*.java', 'shared/**/*.java'
         }
     }
 }
