@@ -17,20 +17,22 @@ public class ConsumerHandler implements Runnable {
 
     @Override
     public void run() {
-        Set<String> sentMessages = new HashSet<>();
+        int messageIndex = 0;
         try {
-            while (true) {
-                List<Message> messages = TopicManager.getMessages(topic);
+            while (!Thread.currentThread().isInterrupted()) {
+                List<Message> messages = TopicManager.getMessages(topic, messageIndex);
                 for (Message message : messages) {
-                    if (!sentMessages.contains(message.getPayload())) {
-                        writer.println(message.getPayload());
-                        sentMessages.add(message.getPayload());
-                    }
+                    writer.println(message.getPayload());
+                    if (writer.checkError()) break;
+                    messageIndex++;
                 }
-                Thread.sleep(1000);
+                if (writer.checkError()) break;
+                if (messages.isEmpty()) {
+                    TopicManager.waitForMessages();
+                }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } finally {
+            writer.close();
         }
     }
 }

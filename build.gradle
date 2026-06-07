@@ -11,3 +11,11 @@ version = '1.0'
 repositories {
     mavenCentral()
 }
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['broker', 'consumer', 'producer', 'shared']
+        }
+    }
+}
